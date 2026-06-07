@@ -112,6 +112,11 @@ TaskPort intercepts the `elmtaskport://` XHR scheme only when the page runs insi
 root: running `elm make src/Main.elm` with no `--output` writes `index.html` there, and opening that
 bare file reproduces this exact error. The real entry point is `publicUI/index.html`.
 
-# Todo
+# Todo (Andrew Clow)
 
 I haven't tested _all_ of the functions! Sorry. I've tested most of them, and more than listed here.
+
+# References
+
+1. [Elm + Tauri](https://jxxcarlson.medium.com/elm-tauri-befa59eab403)
+1. [elm-taskport](https://package.elm-lang.org/packages/lobanov/elm-taskport/latest/)

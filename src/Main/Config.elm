@@ -43,6 +43,8 @@ persist =
         { cheesesPerPage = 4
         , cheeses =
             [ Hard "Double Gloucester"
+            , Hard "Cheddar"
+            , Hard "Parmigiano Reggiano"
             , Soft "Camembert"
             , Soft "Aiket"
             ]

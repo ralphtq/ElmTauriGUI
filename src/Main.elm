@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import Element exposing (Element)
+import Element as E exposing (Element)
 import Element.Background
 import Element.Border
 import Element.Font
@@ -143,72 +143,89 @@ init =
         )
 
 
+textFileExtensions : List String
+textFileExtensions =
+    [ "txt", "elm", "md", "ttl" ]
+
+
 view : Model -> Html.Html Msg
 view model =
-    Element.layout [ Element.padding 20 ] <|
-        Element.column [ Element.spacing 25 ]
-            [ Element.text "Hello! This is just to experiment with using Tauri with elm."
-            , Element.column [ Element.spacing 9 ]
-                [ Element.text "Dialog"
-                , Element.row [ Element.spacing 10 ]
+    E.layout [ E.padding 20 ] <|
+        E.column [ E.spacing 25 ]
+            [ E.el [ Element.Font.bold ] <| E.text "Exploring Andrew Clow's ElmTauriGUI"
+            , E.row []
+                [ E.el [ Element.Font.bold ] <| E.text "Build using >"
+                , E.el [ Element.Font.italic ] <| E.text "cargo tauri dev"
+                ]
+            , E.column [ E.spacing 9 ]
+                [ E.text "Dialog"
+                , E.row [ E.spacing 10 ]
                     [ button AskDialog
                     , button ConfirmDialog
                     , button MessageDialog
                     ]
-                , Element.row [ Element.spacing 10 ]
+                , E.row [ E.spacing 10 ]
                     [ button OpenDirectoriesDialog
                     , button OpenFileDialog
                     , button SaveDialog
                     ]
-                , Element.text " "
-                , Element.text "FS"
-                , Element.row [ Element.spacing 10 ]
+                , E.text " "
+                , E.text "FS"
+                , E.row [ E.spacing 10 ]
                     [ button ReadTextFile
                     , button CopyFile
                     , button RemoveFile
                     , button RenameFile
                     , greenButton "Write Text File (if different)" ToggleTextBox
                     ]
-                , Element.row [ Element.spacing 10 ]
+                , E.row [ E.spacing 10 ]
                     [ button CheckRealFileExists
                     , button CheckFakeFileExists
                     , button ChooseToCreateDir
                     , button ReadDir
                     , button RemoveDir
                     ]
-                , Element.text " "
-                , Element.text "Persistence"
-                , Element.row [ Element.spacing 10 ]
+                , E.text " "
+                , E.text "Persistence"
+                , E.row [ E.spacing 10 ]
                     [ greenButton "+1 cheese per page" <| ConfigMsg (ChangeCheesePerPageBy 1)
                     , greenButton "-1 cheese per page" <| ConfigMsg (ChangeCheesePerPageBy -1)
                     ]
-                , Element.row [ Element.spacing 10 ]
+                , E.row [ E.spacing 10 ]
                     [ greenButton "+ Gruyere" <| ConfigMsg (AddCheese <| Config.Hard "Gruyere")
                     , greenButton "- Gruyere" <| ConfigMsg (RemoveCheese <| Config.Hard "Gruyere")
                     ]
-                , Element.text " "
-                , Element.row [ Element.spacing 30 ]
-                    [ Element.column [ Element.spacing 10 ]
-                        [ Element.text "Path"
-                        , Element.row [ Element.spacing 10 ]
+                , E.row [ E.spacing 10 ]
+                    [ greenButton "+ Parmigiano Reggiano" <| ConfigMsg (AddCheese <| Config.Hard "Parmigiano Reggiano")
+                    , greenButton "- Parmigiano Reggiano" <| ConfigMsg (RemoveCheese <| Config.Hard "Parmigiano Reggiano")
+                    ]
+                , E.row [ E.spacing 10 ]
+                    [ greenButton "+ Cheddar" <| ConfigMsg (AddCheese <| Config.Hard "Cheddar")
+                    , greenButton "- Cheddar" <| ConfigMsg (RemoveCheese <| Config.Hard "Cheddar")
+                    ]
+                , E.text " "
+                , E.row [ E.spacing 30 ]
+                    [ E.column [ E.spacing 10 ]
+                        [ E.text "Path"
+                        , E.row [ E.spacing 10 ]
                             [ greenButton "Get Path..." ToggleShowPathButtons
                             ]
                         ]
-                    , Element.column [ Element.spacing 10 ]
-                        [ Element.text "Modified"
-                        , Element.row [ Element.spacing 10 ]
+                    , E.column [ E.spacing 10 ]
+                        [ E.text "Modified"
+                        , E.row [ E.spacing 10 ]
                             [ button GetModified
                             ]
                         ]
                     ]
                 ]
             , if not model.showPathButtons then
-                Element.none
+                E.none
 
               else
-                Element.column [ Element.spacing 5 ] <|
+                E.column [ E.spacing 5 ] <|
                     List.map
-                        (Element.row [ Element.spacing 5 ]
+                        (E.row [ E.spacing 5 ]
                             << List.map (button << GetPath)
                         )
                         [ [ App, AppConfig, AppData, AppLocalData, AppLog ]
@@ -216,34 +233,34 @@ view model =
                         , [ Download, Executable, Home, LocalData, Log, Picture ]
                         , [ Public, Resource, Runtime, Temp, Template, Video ]
                         ]
-            , Element.el
+            , E.el
                 [ Element.Font.color <|
                     case model.answerWas.good of
                         Good ->
-                            Element.rgb255 125 208 125
+                            E.rgb255 125 208 125
 
                         Bad ->
-                            Element.rgb255 210 120 142
+                            E.rgb255 210 120 142
 
                         Neutral ->
-                            Element.rgb255 85 116 208
+                            E.rgb255 85 116 208
 
                         Broken ->
-                            Element.rgb255 250 0 0
+                            E.rgb255 250 0 0
                 ]
               <|
-                Element.text model.answerWas.text
+                E.text model.answerWas.text
             , case model.textFileContent of
                 Nothing ->
-                    Element.none
+                    E.none
 
                 Just content ->
-                    Element.row [ Element.spacing 10 ]
+                    E.row [ E.spacing 10 ]
                         [ Element.Input.text []
                             { onChange = EditedTextBox
                             , text = content
-                            , placeholder = Just (Element.Input.placeholder [] <| Element.text "Contents to write to text file.")
-                            , label = Element.Input.labelLeft [] <| Element.text ""
+                            , placeholder = Just (Element.Input.placeholder [] <| E.text "Contents to write to text file.")
+                            , label = Element.Input.labelLeft [] <| E.text ""
                             }
                         , button (WriteTextFileContaining content)
                         ]
@@ -258,17 +275,17 @@ button b =
 greenButton : String -> Msg -> Element Msg
 greenButton string msg =
     Element.Input.button
-        [ Element.Background.color <| Element.rgb255 200 255 200
+        [ Element.Background.color <| E.rgb255 200 255 200
         , Element.Border.rounded 10
-        , Element.padding 8
+        , E.padding 8
         , Element.Border.shadow
             { offset = ( 2, 2 )
             , size = 2
             , blur = 2
-            , color = Element.rgb255 150 244 150
+            , color = E.rgb255 150 244 150
             }
         ]
-        { onPress = Just msg, label = Element.text string }
+        { onPress = Just msg, label = E.text string }
 
 
 buttonName : Button -> String
@@ -530,7 +547,7 @@ press model btn =
         ReadTextFile ->
             Dialog2.openFile
                 { defaultPath = Nothing
-                , filters = [ { extensions = [ "txt", "elm", "md" ], name = "Texty Files" } ]
+                , filters = [ { extensions = textFileExtensions, name = "Texty Files" } ]
                 , title = Just "Pick a text file to read"
                 }
                 { cancelled = Err Cancelled, chose = Ok }
@@ -544,7 +561,7 @@ press model btn =
                 open =
                     Dialog2.openFile
                         { defaultPath = Nothing
-                        , filters = [ { extensions = [ "txt", "elm", "md" ], name = "Texty Files" } ]
+                        , filters = [ { extensions = textFileExtensions, name = "Texty Files" } ]
                         , title = Just "Pick a text file to copy"
                         }
                         { cancelled = Err <| Say "Didn't pick a file to copy", chose = Ok }

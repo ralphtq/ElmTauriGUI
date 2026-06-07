@@ -288,10 +288,14 @@ writeDefault persist =
 
 writeDefaultCarefully : Persist pData pMsg -> Task PersistenceError (PersistentData pData)
 writeDefaultCarefully persist =
-    FSInBaseDir.writeTextFile appConfig
-        { filePath = persist.filename, contents = Codec.encodeToString 2 persist.jsonCodec persist.default }
-        (PersistentData persist.default)
-        |> Task.mapError CouldNotSaveDefaultConfig
+    ensureAppConfigDirExistsCarefully
+        |> Task.andThen
+            (\() ->
+                FSInBaseDir.writeTextFile appConfig
+                    { filePath = persist.filename, contents = Codec.encodeToString 2 persist.jsonCodec persist.default }
+                    (PersistentData persist.default)
+                    |> Task.mapError CouldNotSaveDefaultConfig
+            )
 
 
 
@@ -300,10 +304,15 @@ writeDefaultCarefully persist =
 
 write : Persist pData pMsg -> pData -> Task String (PersistentData pData)
 write persist pData =
-    FSInBaseDir.writeTextFile appConfig
-        { filePath = persist.filename, contents = Codec.encodeToString 2 persist.jsonCodec pData }
-        (PersistentData pData)
-        |> Task.mapError (\e -> "Persistence.saveDefault error: " ++ TaskPort.errorToString e)
+    ensureAppConfigDirExists
+        |> Task.andThen
+            (\() ->
+                FSInBaseDir.writeTextFile appConfig
+                    { filePath = persist.filename, contents = Codec.encodeToString 2 persist.jsonCodec pData }
+                    (PersistentData pData)
+                    |> Task.mapError TaskPort.errorToString
+            )
+        |> Task.mapError (\e -> "Persistence.saveDefault error: " ++ e)
 
 
 
