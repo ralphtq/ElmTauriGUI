@@ -81,6 +81,37 @@ If you're cloning it to edit, you'll certainly want to edit tauri.conf.json from
 * npx elm-watch hot
 * cargo tauri dev
 
+## Getting it to build from a fresh clone (macOS notes)
+
+Notes from getting this running on a clean macOS machine. The gotchas:
+
+1. **You need the Tauri _v1_ CLI, and it isn't bundled.** This project pins `tauri = "1.2.0"` in
+   `src-tauri/Cargo.toml`, so install the matching v1 CLI as a cargo subcommand. Plain
+   `cargo install tauri-cli` pulls v2, which won't match the v1 `tauri.conf.json` — pin the version:
+
+       cargo install tauri-cli --version "^1.0"
+
+   If you skip this you get `error: no such command: tauri` when running `cargo tauri dev`.
+2. **Prereqs on PATH:** `elm` (the `beforeDevCommand` runs `elm make ...`), plus the Rust toolchain
+   (`cargo`/`rustc`). No `npm`/`package.json` is required — there's no JS build step.
+3. **Run it, don't open the file.** Launch with `cargo tauri dev` (first build compiles ~290 crates,
+   takes a few minutes). Opening `publicUI/index.html` directly in a browser does **not** work — see
+   the CORS note below.
+
+### "Blocked by CORS policy ... from origin 'null'" on `elmtaskport://...`
+
+If you see something like:
+
+    Access to XMLHttpRequest at 'elmtaskport:///openDlg?v=2.0.1' from origin 'null'
+    has been blocked by CORS policy ...
+
+…it means the page is being loaded from `file://` (origin `null`) instead of being served by Tauri.
+TaskPort intercepts the `elmtaskport://` XHR scheme only when the page runs inside the Tauri webview
+(origin `tauri://localhost`), where `window.__TAURI__` is injected. The fix is simply to launch with
+`cargo tauri dev` rather than opening the HTML file. Also beware a stray `index.html` in the repo
+root: running `elm make src/Main.elm` with no `--output` writes `index.html` there, and opening that
+bare file reproduces this exact error. The real entry point is `publicUI/index.html`.
+
 # Todo
 
 I haven't tested _all_ of the functions! Sorry. I've tested most of them, and more than listed here.
