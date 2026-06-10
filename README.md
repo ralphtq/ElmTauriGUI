@@ -120,3 +120,4 @@ I haven't tested _all_ of the functions! Sorry. I've tested most of them, and mo
 
 1. [Elm + Tauri](https://jxxcarlson.medium.com/elm-tauri-befa59eab403)
 1. [elm-taskport](https://package.elm-lang.org/packages/lobanov/elm-taskport/latest/)
+1. [Yet Another Tauri Book](https://www.developermindset.com/yet-another-tauri-book/)
